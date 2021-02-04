@@ -20,69 +20,44 @@ theme_set(theme_classic())
 
 ### What is the difference between a sample and a population?
 
-Population is full, sample is part of population
-
 ### How do we look at the distribution of data in a sample?
-probability desnsity function,histogram
 
 ### How do we measure aspects of a distribution?
-skew
 
 ### What is a normal distribution?
-mean=median
-bell curve and 1:1 line
 
 First let's generate some synthetic data and talk about how to visualize it.
 
 ```{r}
 #generate a normal distribution
 
-ExNorm<- rnorm(1000, mean=5)%>%
-  as_tibble()
-
-
 #look at distributions
 #histogram
 
-exhist<-ExNorm %>% ggplot(aes(value))+
-  geom_histogram()
-  
-  
-  
+
 #pdf
 
-expdf<-ExNorm %>% ggplot(aes(value))+
-  stat_density()
-  
-#Let's generate a plot that makes comparing these two easier
-exhist/expdf
 
+#Let's generate a plot that makes comparing these two easier
 ```
 
 ### Stack plots to compare histogram and pdf
 
 We will save each plot as ggplot object and then output them using the patchwork package (loaded in the setup chunk).
 
-What is the difference between a histogram and a pdf?
-histogram is easy to see pdf smooth things
-
+What is the difference between a histogram and a pdf?\
 What features of the histogram are preserved? Which are lost?
-The peaks are perserved
 
 ```{r}
 
 #histogram
-exhist<-ExNorm %>% ggplot(aes(value))+
-  geom_histogram()
-  
-  
+
 
 #pdf
-expdf<-ExNorm %>% ggplot(aes(value))+
-  stat_density()
+
 
 #put the plots side by side with + or on top of each other with /
-exhist/expdf
+
 ```
 
 ## What is the difference between a sample and a population.
@@ -102,25 +77,12 @@ What happens if you set the number of samples to the size of the population?
 
 ```{r}
 #generate distribution
-all_the_water<-rnorm(10000,mean=6) %>%
-  as_tibble()
 
 #sample distribution
-sample_of_water<-sample(all_the_water$value, size = 100, replace = FALSE)%>%
-  as_tibble()
 
 #make plots
-pop_hist<-all_the_water %>%
-  ggplot(aes(value))+
-  geom_histogram()+
-  ggtitle("Population: all the water in the lake")
 
-sample_hist<-sample_of_water %>%
-  ggplot(aes(value))+
-    geom_histogram()+
-  ggtitle("Sample of the lake")
 
-pop_hist+sample_hist
 ```
 
 ## Measuring our sample distribution: central tendency.
@@ -132,7 +94,7 @@ The first of these, "where is the middle?" is addressed with measures of central
 To explain the importance of choosing between the mean and median, we will first import some discharge data. Read in the PINE discharge data.
 
 ```{r}
-PINE<- read_csv("PINE_Jan-Mar_2010.csv")
+
 
 ```
 
@@ -148,25 +110,11 @@ Note that distributions like pineQ, that are positively skewed, are very common 
 
 ```{r}
 #Calculate mean and median for cfs in pineQ and values in ExNorm
-pineMean <- mean(PINE$cfs)
-pineMedian <- median(PINE$cfs)
 
 #plot mean and median on the ExNorm distribution
-xmean <- mean(ExNorm$value)
-xmedian <- median (ExNorm$value)
+
 #plot mean and median on the pineQ discharge histogram
 
-EX <- ExNorm %>% ggplot(aes(value))+
-  geom_histogram()+
-  geom_vline(xintercept = xmean, color ="red")+
-  geom_vline(xintercept = xmedian , color ="blue")
-
-PP<-PINE %>% ggplot(aes(cfs))+
-  geom_histogram()+
-  geom_vline(xintercept = pineMean, color ="red")
-
-EX/PP
-  
 ```
 
 ### So what's a weighted average?
@@ -188,12 +136,6 @@ We will assume the proportions of the watershed that each gauge represents are 0
 Write some code to compute the regular mean precip from the values, and then the weighted mean.
 
 ```{r}
-precip <- c(4.5, 5.5, 5.8, 4.7, 3.0)
-weights <-c(0.20, 0.15, 0.40, 0.15, 0.10)
-
-mean(precip)
-
-weighted.mean(precip, weights)
 
 ```
 
@@ -231,13 +173,6 @@ First, let's explore how changing the variability of a distribution changes the 
 
 ```{r}
 
-rnorm(300, sd = 3) %>%
-  as_tibble() %>%
-  ggplot(aes(value)) +
-  stat_density() +
-  scale_x_continuous(limits = c(-30, 30))+ #or xlim(c(-30,30))+
-  scale_y_continuous(limits = c(0,0.5))
-
 ```
 
 Now let's calculate the standard deviation, variance, coefficient of variation, and IQR of the Pine discharge data.
@@ -245,20 +180,18 @@ Now let's calculate the standard deviation, variance, coefficient of variation, 
 ```{r}
 #standard deviation
 
-sd(PINE$cfs)
 
 #variance
 
-var(PINE$cfs)
+
 #coefficient of variation
-sd(PINE$cfs)/mean(PINE$cfs)
+
 
 #IQR using the IQR funciton
-IQR(PINE$cfs)
+
 
 #IQR using the quantile function
-quants<-quantile(PINE$cfs)
-quants[4] - quants[2]
+
 ```
 
 #### What about how lopsided the distribution is?
@@ -272,11 +205,6 @@ Let's look at the quartile skew of the two distributions we've been measuring. C
 Which one is more skewed?
 
 ```{r}
-
-quantsP<-quantile(PINE$cfs)
-((quantsP[3]-quantsP[2]) - (quantsP[2] - quantsP[1])) / quantsP[3] - quantsP[1]
-
-
 
 ```
 
@@ -299,10 +227,6 @@ R to the rescue! There is a built in test for normality called shapiro.test(), w
 You can also make a quantile-quantile plot. A straight line on this plot indicates a normal distribution, a non-straight line indicates it is not normal.
 
 ```{r}
-shapiro.test(PINE$cfs)
 
-qqnorm(PINE$cfs)
 
-shapiro.test(ExNorm$value)
-qqnorm(ExNorm$value)
 ```
